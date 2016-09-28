@@ -1,9 +1,10 @@
 #!/usr/bin/python3
 import argparse
-import db_handler
-import helpers
 import os
 import re
+
+import db_handler
+import helpers
 
 def run_add_entry(args):
     pwfile = os.path.expanduser(args.pwfile)
