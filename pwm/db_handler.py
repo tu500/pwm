@@ -2,10 +2,25 @@ import re
 import codecs
 
 def parse_dbfile(filename):
-    entries = {}
+    """
+    Parse a pwm db file. Return a dictionary of all entries.
+
+    The keys are entry names, the values are tuples of the stored pw and info
+    field.
+    """
 
     with codecs.open(filename, 'rb', encoding='utf8') as f:
         lines = f.readlines()
+
+    return parse_db(lines)
+
+def parse_db(lines):
+    """
+    Parse a db from memory. The parameter `lines` should be an iterable of
+    strings representing lines of a db file.
+    """
+
+    entries = {}
 
     it = iter(lines)
 
@@ -41,6 +56,12 @@ def parse_dbfile(filename):
     return entries
 
 def add_entry(filename, name, pw, info=None, check_if_exists=True):
+    """
+    Append a single entry to a db file. Optionally first check whether an entry
+    with that name already exists. An exception is thrown in this case.
+
+    Performs no error checking.
+    """
 
     if check_if_exists:
         entries = parse_dbfile(filename)

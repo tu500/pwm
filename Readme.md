@@ -10,6 +10,15 @@ Features
 * Copy passwords to clipboard
 * Interface using `dmenu`
 
+Requirements
+------------
+
+You probably want to install the following software:
+
+* `apg` for generating passwords
+* `dmenu` for a graphical interface
+* `xsel` for copying passwords to the X clipboard
+
 How to use
 ----------
 
