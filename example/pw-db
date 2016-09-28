@@ -1,0 +1,13 @@
+# Lines starting with '#' and empty lines are ignored
+# Entry format:
+# Either:
+#
+#   entry name: [info] pw
+#
+# or:
+#
+#   entry name:
+#     [info] pw
+
+foo bar:
+  12345
