@@ -64,9 +64,12 @@ def add_entry(filename, name, pw, info=None, check_if_exists=True):
     """
 
     if check_if_exists:
-        entries = parse_dbfile(filename)
-        if name in entries:
-            raise Exception("Entry already exists: " + repr(name))
+        try:
+            entries = parse_dbfile(filename)
+            if name in entries:
+                raise Exception("Entry already exists: " + repr(name))
+        except FileNotFoundError:
+            pass
 
     if info is None:
         #s = '{name}: {pw}\n'.format(name=name, pw=pw)

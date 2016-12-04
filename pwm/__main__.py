@@ -2,6 +2,7 @@
 import argparse
 import os
 import re
+import sys
 
 from . import db_handler
 from . import helpers
@@ -34,7 +35,12 @@ def run_add_entry(args):
 
 def run_print_entry(args):
     pwfile = os.path.expanduser(args.pwfile)
-    entries = db_handler.parse_dbfile(pwfile)
+
+    try:
+        entries = db_handler.parse_dbfile(pwfile)
+    except FileNotFoundError:
+        print('Password database file `{}` not found. Use `pwm add` to create db file.'.format(pwfile))
+        sys.exit(1)
 
     if args.open_dmenu:
         entry_name = helpers.choose_entry(entries.keys())
@@ -63,7 +69,12 @@ def run_print_entry(args):
 
 def run_list_entries(args):
     pwfile = os.path.expanduser(args.pwfile)
-    entries = db_handler.parse_dbfile(pwfile)
+
+    try:
+        entries = db_handler.parse_dbfile(pwfile)
+    except FileNotFoundError:
+        print('Password database file `{}` not found. Use `pwm add` to create db file.'.format(pwfile))
+        sys.exit(1)
 
     keys = list(entries.keys())
     keys.sort()
