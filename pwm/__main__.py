@@ -20,6 +20,7 @@ def run_add_entry(args):
             entry_info = args.info
     else:
         entry_name = args.name
+        entry_info = args.info
 
     if args.password is None:
         pw = helpers.generate_password(length=args.length)
