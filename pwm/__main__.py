@@ -85,7 +85,7 @@ def main():
     parser = argparse.ArgumentParser(
             description='Password Manager')
 
-    parser.add_argument('--password-file', dest='pwfile', default='~/.pws', help='File which stores the passwords')
+    parser.add_argument('--password-file', dest='pwfile', default=helpers.select_default_pwfile_path(), help='File which stores the passwords')
 
     subparsers = parser.add_subparsers(title='Subcommands')
 

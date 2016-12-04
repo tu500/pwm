@@ -1,4 +1,5 @@
 import subprocess
+import os
 
 def copy2clipboard(string):
     """
@@ -26,3 +27,14 @@ def generate_password(length=50):
     """
     result = subprocess.check_output(['apg', '-n', '1', '-m', str(length)]).decode('utf8')
     return result[:-1] # remove newline
+
+def select_default_pwfile_path():
+    """
+    Return the default path for the pwfile, considering `$XDG_DATA_HOME/pws`,
+    `$XDG_CONFIG_HOME/pws`, `~/.pws`.
+    """
+    if 'XDG_DATA_HOME' in os.environ:
+        return os.path.join(os.environ['XDG_DATA_HOME'], 'pws')
+    if 'XDG_CONFIG_HOME' in os.environ:
+        return os.path.join(os.environ['XDG_CONFIG_HOME'], 'pws')
+    return '~/.pws'
