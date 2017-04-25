@@ -12,21 +12,24 @@ def parse_dbfile(filename):
     with codecs.open(filename, 'rb', encoding='utf8') as f:
         lines = f.readlines()
 
-    return parse_db(lines)
+    return parse_db(lines, filename=filename)
 
-def parse_db(lines):
+def parse_db(lines, filename='-'):
     """
     Parse a db from memory. The parameter `lines` should be an iterable of
     strings representing lines of a db file.
+
+    The `filename` parameter is used in possible parsing failure messages.
     """
 
     entries = {}
 
-    it = iter(lines)
+    it = iter(enumerate(lines, 1))
 
     try:
         while True:
-            l = next(it).rstrip()
+            lineno, l = next(it)
+            l = l.rstrip()
 
             if l.startswith('#') or not l:
                 continue
@@ -38,17 +41,18 @@ def parse_db(lines):
                 continue
 
             if not l.endswith(':'):
-                raise Exception("Parsing Failed: " + repr(l))
+                raise Exception('Parsing Failed: "{}" line {}'.format(filename, lineno))
 
             name = l[:-1]
-            l = next(it).rstrip()
+            lineno, l = next(it)
+            l = l.rstrip()
             match = re.match(r'^  (?:(?P<info>.*) +)?(?P<pw>[^ ]+)$', l)
 
             if match:
                 entries[name] = match.group('pw', 'info')
                 continue
             else:
-                raise Exception("Parsing Failed: " + repr(l))
+                raise Exception('Parsing Failed: "{}" line {}'.format(filename, lineno))
 
     except StopIteration:
         pass
@@ -67,7 +71,7 @@ def add_entry(filename, name, pw, info=None, check_if_exists=True):
         try:
             entries = parse_dbfile(filename)
             if name in entries:
-                raise Exception("Entry already exists: " + repr(name))
+                raise Exception('Entry already exists: ' + repr(name))
         except FileNotFoundError:
             pass
 
@@ -93,7 +97,7 @@ def remove_entry(filename, name_to_remove, ignore_non_existing=False, remove_mul
     updated_lines = []
     entry_count = 0
 
-    it = iter(lines)
+    it = iter(enumerate(lines, 1))
 
     try:
         while True:
@@ -115,7 +119,7 @@ def remove_entry(filename, name_to_remove, ignore_non_existing=False, remove_mul
                     continue
 
             if not l.endswith(':'):
-                raise Exception("Parsing Failed: " + repr(l))
+                raise Exception('Parsing Failed: "{}" line {}'.format(filename, lineno))
 
             first_line = l
             name = l[:-1]
@@ -134,7 +138,7 @@ def remove_entry(filename, name_to_remove, ignore_non_existing=False, remove_mul
                     continue
 
             else:
-                raise Exception("Parsing Failed: " + repr(second_line))
+                raise Exception('Parsing Failed: "{}" line {}'.format(filename, lineno))
 
     except StopIteration:
         pass
