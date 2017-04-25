@@ -11,7 +11,14 @@ def run_add_entry(args):
     pwfile = os.path.expanduser(args.pwfile)
 
     if args.open_dmenu:
-        entry_name = helpers.choose_entry([], prompt='>>> New Password >>>')
+
+        try:
+            entry_name = helpers.choose_entry([], prompt='>>> New Password >>>')
+
+        except FileNotFoundError:
+            print('Could not find dmenu binary, is it installed and in PATH?')
+            sys.exit(1)
+
         match = re.match(r'^(?P<name>.*): (?P<info>.*)$', entry_name)
         #if match and args.info is None:
         if match:
@@ -19,17 +26,31 @@ def run_add_entry(args):
             entry_info = match.group('info')
         else:
             entry_info = args.info
+
     else:
         entry_name = args.name
         entry_info = args.info
 
     if args.password is None:
-        pw = helpers.generate_password(length=args.length)
+
+        try:
+            pw = helpers.generate_password(length=args.length)
+
+        except FileNotFoundError:
+            print('Could not find apg binary, is it installed and in PATH?')
+            sys.exit(1)
+
     else:
         pw = args.password
 
     if args.clipboard:
-        helpers.copy2clipboard(pw)
+
+        try:
+            helpers.copy2clipboard(pw)
+
+        except FileNotFoundError:
+            print('Could not find xsel binary, is it installed and in PATH?')
+            sys.exit(1)
 
     db_handler.add_entry(pwfile, entry_name, pw, entry_info)
 
@@ -43,7 +64,14 @@ def run_print_entry(args):
         sys.exit(1)
 
     if args.open_dmenu:
-        entry_name = helpers.choose_entry(entries.keys())
+
+        try:
+            entry_name = helpers.choose_entry(entries.keys())
+
+        except FileNotFoundError:
+            print('Could not find dmenu binary, is it installed and in PATH?')
+            sys.exit(1)
+
     else:
         entry_name = args.name
 
@@ -65,7 +93,13 @@ def run_print_entry(args):
                     print(entry_name)
 
     if args.clipboard:
-        helpers.copy2clipboard(entry_pw)
+
+        try:
+            helpers.copy2clipboard(entry_pw)
+
+        except FileNotFoundError:
+            print('Could not find xsel binary, is it installed and in PATH?')
+            sys.exit(1)
 
 def run_list_entries(args):
     pwfile = os.path.expanduser(args.pwfile)
