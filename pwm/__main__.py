@@ -54,14 +54,32 @@ def run_add_entry(args):
 
     db_handler.add_entry(pwfile, entry_name, pw, entry_info)
 
+def augment_entries_with_info(entries):
+
+    res = {}
+
+    for name, (pw, info) in entries.items():
+
+        if info:
+            res['{} ({})'.format(name, info)] = (pw, info)
+
+        else:
+            res[name] = (pw, info)
+
+    return res
+
 def run_print_entry(args):
     pwfile = os.path.expanduser(args.pwfile)
 
     try:
         entries = db_handler.parse_dbfile(pwfile)
+
     except FileNotFoundError:
         print('Password database file `{}` not found. Use `pwm add` to create db file.'.format(pwfile))
         sys.exit(1)
+
+    if args.augment_info:
+        entries = augment_entries_with_info(entries)
 
     if args.open_dmenu:
 
@@ -106,9 +124,13 @@ def run_list_entries(args):
 
     try:
         entries = db_handler.parse_dbfile(pwfile)
+
     except FileNotFoundError:
         print('Password database file `{}` not found. Use `pwm add` to create db file.'.format(pwfile))
         sys.exit(1)
+
+    if args.augment_info:
+        entries = augment_entries_with_info(entries)
 
     keys = list(entries.keys())
     keys.sort()
@@ -137,6 +159,7 @@ def main():
     entry_name_group = parser_print.add_mutually_exclusive_group(required=True)
     entry_name_group.add_argument('name', nargs='?', help='Name of entry to display')
     entry_name_group.add_argument('-d', '--open-dmenu', action='store_true', help='Instead of taking the entry name on the commandline, open a dmenu list to choose an entry')
+    parser_print.add_argument('-i', '--augment-info', action='store_true', help='When prompting using dmenu, augment entries with their info value')
     parser_print.add_argument('-c', '--copy-to-clipboard', dest='clipboard', action='store_true', help='Copy found password entry to clipboard')
     output_group = parser_print.add_argument_group(title='output', description='Specified fields will be printed, on separate lines, in the order given. Default is `--print-password` only.')
     output_group.add_argument('-q', '--quiet', action='store_true', help='No output. Overrides `--print-*` flags')
@@ -146,6 +169,7 @@ def main():
     parser_print.set_defaults(func=run_print_entry)
 
     parser_list = subparsers.add_parser('list', help='List all available entries')
+    parser_list.add_argument('-i', '--augment-info', action='store_true', help='Augment entries with their info value')
     parser_list.set_defaults(func=run_list_entries)
 
     args = parser.parse_args()

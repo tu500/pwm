@@ -25,5 +25,5 @@ How to use
 My standard usage:
 
 * `pwm.py add --copy-to-clipboard --open-dmenu` to add/generate a new password
-* `pwm.py show --copy-to-clipboard --quiet --open-dmenu` to choose a password
-  from the database
+* `pwm.py show --copy-to-clipboard --quiet --augment-info --open-dmenu` to
+  choose a password from the database
