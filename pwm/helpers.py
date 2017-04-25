@@ -1,5 +1,5 @@
-import subprocess
 import os
+import subprocess
 
 def copy2clipboard(string):
     """

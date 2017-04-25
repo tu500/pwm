@@ -1,5 +1,5 @@
-import re
 import codecs
+import re
 
 def parse_dbfile(filename):
     """
