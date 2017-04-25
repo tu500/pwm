@@ -137,6 +137,38 @@ def run_list_entries(args):
     for i in keys:
         print(i)
 
+def run_remove_entry(args):
+    pwfile = os.path.expanduser(args.pwfile)
+
+    try:
+        entries = db_handler.parse_dbfile(pwfile)
+
+    except FileNotFoundError:
+        print('Password database file `{}` not found. Use `pwm add` to create db file.'.format(pwfile))
+        sys.exit(1)
+
+    if args.augment_info:
+        entries = augment_entries_with_info(entries)
+
+    if args.open_dmenu:
+
+        try:
+            entry_name = helpers.choose_entry(entries.keys())
+
+        except FileNotFoundError:
+            print('Could not find dmenu binary, is it installed and in PATH?')
+            sys.exit(1)
+
+    else:
+        entry_name = args.name
+
+    db_handler.remove_entry(
+            pwfile,
+            entry_name,
+            ignore_non_existing=args.ignore_non_existing,
+            remove_multiple=args.remove_multiple,
+        )
+
 def main():
     parser = argparse.ArgumentParser(
             description='Password Manager')
@@ -171,6 +203,15 @@ def main():
     parser_list = subparsers.add_parser('list', help='List all available entries')
     parser_list.add_argument('-i', '--augment-info', action='store_true', help='Augment entries with their info value')
     parser_list.set_defaults(func=run_list_entries)
+
+    parser_remove = subparsers.add_parser('remove', help='Remove a password from the db.')
+    entry_name_group = parser_remove.add_mutually_exclusive_group(required=True)
+    entry_name_group.add_argument('name', nargs='?', help='Name of entry to remove')
+    entry_name_group.add_argument('-d', '--open-dmenu', action='store_true', help='Instead of taking the entry name on the commandline, open a dmenu list to choose an entry')
+    parser_remove.add_argument('-i', '--augment-info', action='store_true', help='When prompting using dmenu, augment entries with their info value')
+    parser_remove.add_argument('-n', '--ignore-non-existing', action='store_true', help='Do not fail if the entry is not present in the db.')
+    parser_remove.add_argument('-m', '--remove-multiple', action='store_true', help='Remove all occurences if the entry is present multiple times in the db.')
+    parser_remove.set_defaults(func=run_remove_entry)
 
     args = parser.parse_args()
     if not hasattr(args, 'func'):
